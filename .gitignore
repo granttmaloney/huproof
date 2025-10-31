@@ -22,6 +22,7 @@ dist/
 
 # Node/Web
 web/node_modules/
+circuits/node_modules/
 
 # Circuits build artifacts
 circuits/build/
