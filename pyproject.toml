@@ -18,6 +18,7 @@ dependencies = [
     "pyjwt>=2.8.0",
     "python-multipart>=0.0.9",
     "typing-extensions>=4.9.0",
+    "slowapi>=0.1.9",
 ]
 
 [project.optional-dependencies]

@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
+
+from .enroll import PublicInputs, ProofSchema
 
 
 class LoginStartResponse(BaseModel):
@@ -11,8 +13,8 @@ class LoginStartResponse(BaseModel):
 
 
 class LoginFinishRequest(BaseModel):
-    proof: dict
-    public_inputs: dict
+    proof: ProofSchema
+    public_inputs: PublicInputs
 
 
 class LoginFinishResponse(BaseModel):

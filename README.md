@@ -49,6 +49,15 @@ Notes:
 
 This is a PoC scaffold. API endpoints are stubbed; circuits and browser proving are implemented in later tasks.
 
+## Database
+
+Currently using SQLite for local development. For production deployment, consider migrating to:
+- Supabase (hosted PostgreSQL + auth + realtime)
+- Railway/Neon (hosted PostgreSQL)
+- Self-hosted PostgreSQL
+
+SQLModel/SQLAlchemy supports PostgreSQL with minimal code changes - mainly updating `DB_URL` connection string.
+
 ## License
 
 MIT
