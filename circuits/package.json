@@ -1,0 +1,21 @@
+{
+  "name": "huproof-circuits",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "circom -l node_modules keystroke.circom --r1cs --wasm --sym -o build",
+    "ptau:new": "snarkjs powersoftau new bn128 17 build/pot17_0000.ptau",
+    "ptau:contrib": "echo 'someEntropy' | snarkjs powersoftau contribute build/pot17_0000.ptau build/pot17_0001.ptau",
+    "setup": "snarkjs groth16 setup build/keystroke.r1cs build/pot17_0001.ptau build/keystroke.zkey",
+    "setup:contrib": "echo 'someEntropy' | snarkjs zkey contribute build/keystroke.zkey build/keystroke_final.zkey",
+    "export:vkey": "snarkjs zkey export verificationkey build/keystroke_final.zkey build/verification_key.json",
+    "prove": "snarkjs groth16 prove build/keystroke_final.zkey build/keystroke_js/keystroke.wasm build/input.json build/proof.json build/public.json",
+    "verify": "snarkjs groth16 verify build/verification_key.json build/public.json build/proof.json"
+  },
+  "devDependencies": {
+    "snarkjs": "^0.7.4",
+    "circomlib": "^2.0.5"
+  }
+}
+
+

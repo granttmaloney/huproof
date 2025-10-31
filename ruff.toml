@@ -1,0 +1,23 @@
+line-length = 100
+target-version = "py311"
+
+select = [
+  "E",   # pycodestyle errors
+  "F",   # pyflakes
+  "I",   # isort
+  "UP",  # pyupgrade
+  "B",   # bugbear
+  "S",   # flake8-bandit
+  "N",   # pep8-naming
+  "ANN", # flake8-annotations
+]
+
+ignore = [
+  "ANN101", # Missing type annotation for self in method
+  "ANN102", # Missing type annotation for cls in classmethod
+]
+
+[per-file-ignores]
+"tests/*" = ["S101", "ANN*"]
+
+
