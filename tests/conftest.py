@@ -1,6 +1,7 @@
 """Test fixtures and utilities."""
 
 import os
+import tempfile
 from typing import Generator
 
 import pytest
@@ -14,11 +15,24 @@ def test_client() -> Generator[TestClient, None, None]:
     os.environ.setdefault("APP_SECRET", "test-secret")
     os.environ.setdefault("BYPASS_ZK_VERIFY", "1")
     os.environ.setdefault("ORIGIN", "http://localhost:5173")
-    os.environ.setdefault("DB_URL", "sqlite:///./test.db")
+    
+    # Use unique temp file for each test
+    db_file = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
+    db_path = db_file.name
+    db_file.close()
+    os.environ["DB_URL"] = f"sqlite:///{db_path}"
     
     # Import after env vars are set
     from huproof.app import app
     from huproof.db.session import init_db
+    
+    # Force reinitialize the engine with new DB URL
+    from sqlalchemy import create_engine
+    from huproof.config.settings import get_settings
+    from huproof.db import session as db_session
+    
+    settings = get_settings()
+    db_session.engine = create_engine(settings.db_url)
     
     # Initialize database
     init_db()
@@ -28,10 +42,11 @@ def test_client() -> Generator[TestClient, None, None]:
     
     yield client
     
-    # Cleanup: remove test database
+    # Cleanup
     try:
-        os.remove("test.db")
-    except FileNotFoundError:
+        db_session.engine.dispose()
+        os.remove(db_path)
+    except (FileNotFoundError, AttributeError):
         pass
 
 

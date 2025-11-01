@@ -57,7 +57,7 @@ def health() -> dict[str, str | dict[str, str]]:
 )
 def metrics() -> dict[str, Any]:
     """Get current metrics statistics."""
-    from ..core.metrics import get_all_metrics
+    from .core.metrics import get_all_metrics
     
     return {
         "metrics": get_all_metrics(),
