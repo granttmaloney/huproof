@@ -27,7 +27,7 @@ class PublicInputs(BaseModel):
             raise ValueError("origin_hash must be hexadecimal")
         return v.lower()
 
-    @field_validator("C", "sig", "nonce")
+    @field_validator("C", "sig")
     @classmethod
     def validate_decimal_string(cls, v: str) -> str:
         """Validate decimal string format."""
