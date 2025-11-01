@@ -32,9 +32,16 @@ def test_client() -> Generator[TestClient, None, None]:
     from huproof.db import session as db_session
     
     settings = get_settings()
-    db_session.engine = create_engine(settings.db_url)
     
-    # Initialize database
+    # Dispose old engine if it exists and reset global
+    if hasattr(db_session, '_engine') and db_session._engine is not None:
+        try:
+            db_session._engine.dispose()
+        except Exception:
+            pass
+    db_session._engine = None
+    
+    # Initialize database (will create new engine with new DB URL)
     init_db()
     
     # Create test client
@@ -44,9 +51,13 @@ def test_client() -> Generator[TestClient, None, None]:
     
     # Cleanup
     try:
-        db_session.engine.dispose()
-        os.remove(db_path)
-    except (FileNotFoundError, AttributeError):
+        # Close all connections
+        if hasattr(db_session, '_engine') and db_session._engine is not None:
+            db_session._engine.dispose()
+        # Remove database file
+        if os.path.exists(db_path):
+            os.remove(db_path)
+    except Exception:
         pass
 
 

@@ -5,7 +5,7 @@ from typing import Callable
 
 from fastapi import Request, HTTPException, status
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from slowapi.util import get_remote_address, get_ipaddr
 from slowapi.errors import RateLimitExceeded
 
 from .logging import get_logger
@@ -18,10 +18,11 @@ limiter = Limiter(key_func=get_remote_address)
 
 def get_client_ip(request: Request) -> str:
     """Extract client IP from request for rate limiting."""
-    if hasattr(request.state, "client_ip"):
-        return request.state.client_ip
-    # Fallback to slowapi's default
-    return get_remote_address(request)
+    # Prioritize X-Forwarded-For if behind a proxy, otherwise use host
+    if "X-Forwarded-For" in request.headers:
+        return request.headers["X-Forwarded-For"].split(",")[0].strip()
+    # Use get_ipaddr for TestClient compatibility
+    return get_ipaddr(request)
 
 
 # Rate limit decorators
@@ -45,10 +46,10 @@ def setup_rate_limit_handler(app) -> None:
     app.state.limiter = limiter
 
 
-def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> HTTPException:
+def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
     """Custom rate limit exceeded handler."""
     logger.warning("rate_limit_exceeded", ip=get_client_ip(request), path=request.url.path)
-    return HTTPException(
+    raise HTTPException(
         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
         detail="Rate limit exceeded. Please try again later.",
     )
